@@ -1,0 +1,117 @@
+<html>    
+  <head> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>gmap3 Cluster access marker data</title>
+    <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>        
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script> 
+    <script type="text/javascript" src="js/gmap3.js"></script> 
+    <style>
+      body{
+        text-align:center;
+      }
+      .gmap3{
+        margin: 20px auto;
+        border: 1px dashed #C0C0C0;
+        width: 1000px;
+        height: 750px;
+      }
+      .cluster{
+        color: #FFFFFF;
+        text-align:center;
+        font-family: 'Arial, Helvetica';
+        font-size:11px;
+        font-weight:bold;
+      }
+      .cluster-1{
+        background-image:url(images/m1.png);
+        line-height:53px;
+        width: 53px;
+        height: 52px;
+      }
+    </style>
+    
+    <script type="text/javascript">
+      
+      // generate an array of colors
+      var colors = "black brown green purple yellow grey orange white".split(" ");
+      
+      // on document ready function
+      $(function(){
+        
+        // create gmap3 and call the marker generation function  
+        $('#test1').gmap3({
+          map:{
+            options:{
+              center:[51.458953,-2.583849],
+              zoom: 17,
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+            },
+            onces: {
+              bounds_changed: function(){
+                randomMarkers($(this).gmap3("get").getBounds());
+              }
+            }
+          }
+        });
+        
+      });
+      
+      // generate a list of 70 random marker and call gmap3 clustering function
+      function randomMarkers(bounds){
+        var southWest = bounds.getSouthWest(),
+          northEast = bounds.getNorthEast(),
+          lngSpan = northEast.lng() - southWest.lng(),
+          latSpan = northEast.lat() - southWest.lat(),
+          i, color, list = [];
+           
+        // generate random list
+        for (i = 0; i < 70; i++) {
+          color = colors[Math.floor(Math.random()*colors.length)];
+          list.push({
+            latLng:[southWest.lat() + latSpan * Math.random(), southWest.lng() + lngSpan * Math.random()],
+            options:{
+              icon: "http://maps.google.com/mapfiles/marker_"+color+".png"
+            },
+            tag:color
+          });
+        }
+        
+        // call the clustering function
+        $('#test1').gmap3({
+          marker:{
+            values: list,
+            cluster:{
+              radius: 40, 
+              // This style will be used for clusters with more than 0 markers
+              0: {
+                content: '<div class="cluster cluster-1">CLUSTER_COUNT</div>',
+                width: 53,
+                height: 52
+              },
+              // This allows us to bind events to the cluster
+              events: {
+                click: clickOnCluster
+              }
+            }
+          }
+        });
+      }
+
+      // Cluster events give you 3 arguments to play with
+      // inside the data of context you have the latLng of the cluster
+      // and an array, markers
+      function clickOnCluster(overlay, event, context) {        
+        $("#test1").gmap3({
+          infowindow:{
+            latLng: context.data.latLng,
+            options:{
+              content: $.map(context.data.markers, function(marker){return marker.tag}).join("<br>")
+            }
+          }
+        });
+      }            
+    </script>
+  <body>
+    <div id="test1" class="gmap3"></div>
+  </body>
+</html>
