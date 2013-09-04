@@ -27,4 +27,4 @@ The argument `context` contains the latLng of the cluster inside `context.data.l
 
 This is the only way I've found that gets what markers are inside a cluster.  What I would like is to be able to have a callback when the cluster is styled/created so that I can customise the clusters appearance depending on what markers are inside.
 
-Code is an extended demo from https://github.com/jbdemonte/gmap3
+Code is an extended demo from https://github.com/jbdemonte/gmap3 v5.1.1
